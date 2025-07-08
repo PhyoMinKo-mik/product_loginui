@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:product_loginui/apiservices.dart';
+import 'package:product_loginui/intro.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -123,18 +124,41 @@ class _LoginpageState extends State<Loginpage> {
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
+                  // onPressed: () async {
+                  //   final result = await Apiservice.userLogin(
+                  //     _emailcontroller.text,
+                  //     _passwordcontroller.text,
+                  //   );
+                  //   if (result != null && result['statusCode'] == 200) {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => Intro()),
+                  //     );
+                  //   }
+
+                  //   _showErrorDialog('${result!['message']}');
+
+                  //   // if (result['success']) {
+                  //   // } else {
+                  //   //   return _showErrorDialog(result['message']);
+                  //   // }
+                  // },
                   onPressed: () async {
                     final result = await Apiservice.userLogin(
-                      _emailcontroller.text,
-                      _passwordcontroller.text,
+                      _emailcontroller.text.trim(),
+                      _passwordcontroller.text.trim(),
                     );
 
-                    _showErrorDialog('${result!['message']}');
-
-                    // if (result['success']) {
-                    // } else {
-                    //   return _showErrorDialog(result['message']);
-                    // }
+                    if (result != null && result['code'] == 200) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Intro()),
+                      );
+                    } else {
+                      _showErrorDialog(
+                        result?['message'] ?? 'Login failed. Please try again.',
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(

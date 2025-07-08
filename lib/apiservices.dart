@@ -60,6 +60,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:product_loginui/user_model.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
@@ -88,10 +89,39 @@ class Apiservice {
       };
       response = await _dio.post(
         'https://hr.esoftmm.com/core/api/auth/access-token',
-        data: {'username': email, 'password': password, 'device': 'android'},
+        data: {
+          'username': 'phyoko',
+          'password': 'Password@123',
+          'device': 'android',
+        },
         options: Options(headers: headers),
       );
-      return {'success': true, 'data': response.data};
+      final Map<String, dynamic> data = response.data['data'];
+
+      final String accessToken = data['access_token'];
+      final String refreshToken = data['refresh_token'];
+      final String id = data['user']['id'];
+      final String userName = data['user']['userName'];
+      final String userEmail = data['user']['email'];
+      final String phoneNumber = data['user']['phoneNumber'];
+
+      final user = UserModel(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        id: id,
+        userName: userName,
+        phoneNumber: phoneNumber,
+        email: email,
+      );
+
+      // print(accessToken);
+      // print(refreshToken);
+      // print(id);
+      // print(userName);
+      // print(userEmail);
+      // print(phoneNumber);
+
+      return {'code': 200, 'data': response.data};
     } on DioException catch (e) {
       if (e.error is SocketException) {
         return {'message': 'no internet connection'};
