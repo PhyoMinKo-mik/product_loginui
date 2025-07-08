@@ -57,9 +57,11 @@
 //   }
 // }
 
-import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:talker_dio_logger/talker_dio_logger.dart';
+import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
+import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
 
 class Apiservice {
   static final Dio _dio = Dio()
@@ -74,62 +76,107 @@ class Apiservice {
       ),
     );
 
-  static Future<Map<String, dynamic>> userLogin(
+  static Future<Map<String, dynamic>?> userLogin(
     String email,
     String password,
   ) async {
-    var headers = {
-      'Content-Type': 'application/json',
-      'Mobile-Request': 'Secure',
-    };
-
-    final data = {"username": email, "password": password, "device": "android"};
-
+    Response? response;
     try {
-      var response = await _dio.post(
+      final headers = {
+        'Content-Type': 'application/json',
+        'Mobile-Request': 'Secure',
+      };
+      response = await _dio.post(
         'https://hr.esoftmm.com/core/api/auth/access-token',
-        data: jsonEncode(data),
+        data: {'username': email, 'password': password, 'device': 'android'},
         options: Options(headers: headers),
       );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'success': true, 'data': response.data};
-      } else {
-        return {
-          'success': false,
-          'message': 'Unexpected status: ${response.statusCode}',
-          'error': response.data?.toString() ?? 'No response data',
-        };
-      }
+      return {'success': true, 'data': response.data};
     } on DioException catch (e) {
-      final statusCode = e.response?.statusCode ?? 0;
-      final errorData =
-          e.response?.data?.toString() ?? e.message ?? 'Unknown Dio error';
-      final path = e.requestOptions.path;
-
-      final detailedError =
-          '''
-Status: $statusCode
-Message: $errorData
-Path: $path
-This exception was thrown because the response has a status code of $statusCode.
-Read more: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-''';
-
-      return {
-        'success': false,
-        'message': 'Login failed',
-        'error': detailedError,
-      };
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'Unexpected error occurred',
-        'error': e.toString(),
-      };
+      if (e.error is SocketException) {
+        return {'message': 'no internet connection'};
+      } else if (e.response!.data != null) {
+        return e.response!.data;
+      } else {
+        return {'message': 'something went wrong'};
+      }
     }
   }
 }
+
+// import 'dart:convert';
+// import 'package:dio/dio.dart';
+// import 'package:talker_dio_logger/talker_dio_logger.dart';
+
+// class Apiservice {
+//   static final Dio _dio = Dio()
+//     ..interceptors.add(
+//       TalkerDioLogger(
+//         settings: TalkerDioLoggerSettings(
+//           printErrorData: true,
+//           printErrorHeaders: true,
+//           printRequestData: true,
+//           printErrorMessage: true,
+//         ),
+//       ),
+//     );
+
+//   static Future<Map<String, dynamic>> userLogin(
+//     String email,
+//     String password,
+//   ) async {
+//     var headers = {
+//       'Content-Type': 'application/json',
+//       'Mobile-Request': 'Secure',
+//     };
+
+//     final data = {"username": email, "password": password, "device": "android"};
+
+//     try {
+//       var response = await _dio.post(
+//         'https://hr.esoftmm.com/core/api/auth/access-token',
+//         data: jsonEncode(data),
+//         options: Options(headers: headers),
+//       );
+
+//       if (response.statusCode == 200 || response.statusCode == 201) {
+//         return {'success': true, 'data': response.data};
+//       } else {
+//         return {
+//           'success': false,
+//           'message': 'Unexpected status: ${response.statusCode}',
+//           'error': response.data?.toString() ?? 'No response data',
+//         };
+//       }
+//     } on DioException catch (e) {
+//       final statusCode = e.response?.statusCode ?? 0;
+//       final errorData =
+//           e.response?.data?.toString() ?? e.message ?? 'Unknown Dio error';
+//       final path = e.requestOptions.path;
+
+//       final detailedError =
+//           '''
+// Status: $statusCode
+// Message: $errorData
+// Path: $path
+// This exception was thrown because the response has a status code of $statusCode.
+// Read more: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+// ''';
+
+//       return {
+//         'success': false,
+//         'message': 'Login failed',
+//         'error': detailedError,
+//       };
+//     } catch (e) {
+//       return {
+//         'success': false,
+//         'message': 'Unexpected error occurred',
+//         'error': e.toString(),
+//       };
+//     }
+//   }
+// }
 
 // import 'package:dio/dio.dart';
 

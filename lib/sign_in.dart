@@ -15,32 +15,19 @@ class _IntroPageState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  void _showErrorDialog(BuildContext context, String message, [String? error]) {
+  void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(message),
-                if (error != null && error.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    error,
-                    style: const TextStyle(fontSize: 12, color: Colors.red),
-                  ),
-                ],
-              ],
-            ),
-          ),
+          title: Text('Error'),
+          content: Text(message),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
           ],
         );
@@ -201,18 +188,10 @@ class _IntroPageState extends State<SignIn> {
                               passwordController.text,
                             );
 
-                            if (result['success']) {
-                              print("Login Successful: ${result['data']}");
-                            } else {
-                              _showErrorDialog(
-                                context,
-                                result['message'],
-                                result['error'],
-                              );
-                            }
+                            _showErrorDialog('${result!['message']}');
+                            const Text("Sign In");
                           },
-
-                          child: const Text("Sign In"),
+                          child: null,
                         ),
                       ),
                     ),
