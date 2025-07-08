@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:product_loginui/apiservices.dart';
-import 'package:product_loginui/sign_up.dart';
 
-class SignIn extends StatefulWidget {
-  const SignIn({super.key});
+class Loginpage extends StatefulWidget {
+  const Loginpage({super.key});
 
   @override
-  State<SignIn> createState() => _IntroPageState();
+  State<Loginpage> createState() => _LoginpageState();
 }
 
-class _IntroPageState extends State<SignIn> {
-  bool rememberMe = false;
-
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+class _LoginpageState extends State<Loginpage> {
+  final TextEditingController _emailcontroller = TextEditingController();
+  final TextEditingController _passwordcontroller = TextEditingController();
+  bool isChecked = false;
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -35,180 +32,135 @@ class _IntroPageState extends State<SignIn> {
     );
   }
 
-  String? validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Email is required';
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
-    return null;
-  }
-
-  void handleSignIn() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Login Successful')));
-    }
-  }
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    double screenwidth = MediaQuery.of(context).size.width;
+    double width = MediaQuery.of(context).size.width;
+    // double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 37, 35, 35),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
-              width: screenwidth,
-              height: 280,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              height: 250,
+              width: width,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 63, 63, 63),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(50),
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 60, right: 30),
+                padding: const EdgeInsets.only(left: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context, '/');
-                      },
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-                    const SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Welcome',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30,
-                            ),
-                          ),
-                          Text(
-                            'Back!',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30,
-                            ),
-                          ),
-                          Text(
-                            'Continue Your Adventure.',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ],
+                    SizedBox(
+                      height: 130,
+                      width: width,
+                      child: IconButton(
+                        alignment: Alignment(-1.08, 0),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back, color: Colors.white),
                       ),
+                    ),
+                    Text(
+                      'Welcome\nBack!',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Continue your adventure',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
               ),
             ),
-
-            const SizedBox(height: 80),
-
+            SizedBox(height: 100),
             Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: emailController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        labelStyle: TextStyle(color: Colors.white70),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white38),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      validator: validateEmail,
-                    ),
-                    const SizedBox(height: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: TextField(
+                controller: _emailcontroller,
+                decoration: InputDecoration(hintText: 'Email'),
+              ),
+            ),
 
-                    TextFormField(
-                      style: const TextStyle(color: Colors.white),
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        labelStyle: TextStyle(color: Colors.white70),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: TextField(
+                controller: _passwordcontroller,
+                decoration: InputDecoration(hintText: 'Password'),
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(left: 18),
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isChecked = value ?? false;
+                      });
+                    },
+                  ),
 
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: rememberMe,
-                          onChanged: (bool? newValue) {
-                            setState(() {
-                              rememberMe = newValue!;
-                            });
-                          },
-                        ),
-                        const Text(
-                          'Remember Me',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
+                  Text('Remember me', style: TextStyle(fontSize: 12)),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20, right: 32, left: 32),
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final result = await Apiservice.userLogin(
+                      _emailcontroller.text,
+                      _passwordcontroller.text,
+                    );
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFECE8E4),
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () async {
-                            final result = await Apiservice.userLogin(
-                              emailController.text,
-                              passwordController.text,
-                            );
+                    _showErrorDialog('${result!['message']}');
 
-                            _showErrorDialog('${result!['message']}');
-                            const Text("Sign In");
-                          },
-                          child: null,
-                        ),
-                      ),
+                    // if (result['success']) {
+                    // } else {
+                    //   return _showErrorDialog(result['message']);
+                    // }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(
+                      255,
+                      63,
+                      63,
+                      63,
+                    ), // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(height: 15),
-
-                    Center(
-                      child: TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          "Forgot Password?",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
+                  ),
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 180),
+              child: Text('Forgot password?'),
             ),
           ],
         ),

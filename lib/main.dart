@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: <String, WidgetBuilder>{
         '/': (context) => SignUp(),
-        '/SignIn': (context) => SignIn(),
+        '/Login': (context) => Loginpage(),
         '/Intro': (context) => Intro(),
       },
     );
