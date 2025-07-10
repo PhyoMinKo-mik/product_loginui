@@ -58,7 +58,6 @@
 // }
 
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:product_loginui/user_model.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
@@ -92,8 +91,8 @@ class Apiservice {
         data: {'username': username, 'password': password, 'device': 'android'},
         options: Options(headers: headers),
       );
-      final Map<String, dynamic> data = response.data['data'];
 
+      final Map<String, dynamic> data = response.data['data'];
       final String accessToken = data['access_token'];
       final String refreshToken = data['refresh_token'];
       final String id = data['user']['id'];
@@ -110,21 +109,49 @@ class Apiservice {
         email: userEmail,
       );
 
-      // print(accessToken);
-      // print(refreshToken);
-      // print(id);
-      // print(userName);
-      // print(userEmail);
-      // print(phoneNumber);
-
-      return {'code': 200, 'data': response.data};
+      return {'code': 200, 'data': data};
     } on DioException catch (e) {
       if (e.error is SocketException) {
         return {'message': 'no internet connection'};
-      } else if (e.response!.data != null) {
+      } else if (e.response?.data != null) {
         return e.response!.data;
       } else {
         return {'message': 'something went wrong'};
+      }
+    }
+  }
+
+  static Future<bool> verifyAccessToken(String accessToken) async {
+    try {
+      final response = await _dio.get(
+        'https://hr.esoftmm.com/core/api/auth/verify-token',
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> refreshAccessToken(
+    String refreshToken,
+  ) async {
+    try {
+      final response = await _dio.post(
+        'https://hr.esoftmm.com/core/api/auth/refresh-token',
+        data: {'refresh_token': refreshToken},
+      );
+
+      if (response.statusCode == 200) {
+        return response.data['data'];
+      } else {
+        return null;
+      }
+    } on DioException catch (e) {
+      if (e.error is SocketException) {
+        return {'message': 'no internet connection'};
+      } else {
+        return null;
       }
     }
   }
