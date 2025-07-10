@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MaterialApp(home: Intro(), debugShowCheckedModeBanner: false));
-}
+import 'package:hive/hive.dart';
+import 'package:product_loginui/user_model.dart';
 
 class Intro extends StatefulWidget {
   const Intro({super.key});
 
   @override
-  State<Intro> createState() => _OnboardingCarouselState();
+  State<Intro> createState() => _IntroState();
 }
 
-class _OnboardingCarouselState extends State<Intro> {
+class _IntroState extends State<Intro> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -24,12 +22,16 @@ class _OnboardingCarouselState extends State<Intro> {
     {'image': 'assets/image/Batman3.jpg', 'title': 'Join events\naround you.'},
   ];
 
+  Future<void> _logout() async {
+    await Hive.box<UserModel>('userBox').delete('currentUser');
+    Navigator.pushNamedAndRemoveUntil(context, '/SignUp', (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background PageView
           Positioned.fill(
             child: PageView.builder(
               controller: _pageController,
@@ -40,7 +42,6 @@ class _OnboardingCarouselState extends State<Intro> {
               itemBuilder: (context, index) {
                 return Stack(
                   children: [
-                    // Background image
                     Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
@@ -49,9 +50,7 @@ class _OnboardingCarouselState extends State<Intro> {
                         ),
                       ),
                     ),
-                    // Dark overlay
                     Container(color: Colors.black.withOpacity(0.4)),
-                    // Slide content
                     Column(
                       children: [
                         const SizedBox(height: 60),
@@ -102,9 +101,7 @@ class _OnboardingCarouselState extends State<Intro> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 150,
-                        ), // Leave space for white box
+                        const SizedBox(height: 150),
                       ],
                     ),
                   ],
@@ -112,8 +109,6 @@ class _OnboardingCarouselState extends State<Intro> {
               },
             ),
           ),
-
-          // Fixed bottom white container
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -145,11 +140,9 @@ class _OnboardingCarouselState extends State<Intro> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () {
-                        // Sign in logic
-                      },
+                      onPressed: _logout,
                       child: const Text(
-                        'Sign in',
+                        'Logout',
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -157,7 +150,7 @@ class _OnboardingCarouselState extends State<Intro> {
                   const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () {
-                      // Navigate to create account
+                      Navigator.pushNamed(context, '/SignUp');
                     },
                     child: const Text(
                       'Or Create Account →',

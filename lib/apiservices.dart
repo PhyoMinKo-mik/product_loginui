@@ -78,7 +78,7 @@ class Apiservice {
     );
 
   static Future<Map<String, dynamic>?> userLogin(
-    String email,
+    String username,
     String password,
   ) async {
     Response? response;
@@ -89,11 +89,7 @@ class Apiservice {
       };
       response = await _dio.post(
         'https://hr.esoftmm.com/core/api/auth/access-token',
-        data: {
-          'username': 'phyoko',
-          'password': 'Password@123',
-          'device': 'android',
-        },
+        data: {'username': username, 'password': password, 'device': 'android'},
         options: Options(headers: headers),
       );
       final Map<String, dynamic> data = response.data['data'];
@@ -111,7 +107,7 @@ class Apiservice {
         id: id,
         userName: userName,
         phoneNumber: phoneNumber,
-        email: email,
+        email: userEmail,
       );
 
       // print(accessToken);
