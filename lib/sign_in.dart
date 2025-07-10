@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:product_loginui/apiservices.dart';
 import 'package:product_loginui/intro.dart';
+import 'package:product_loginui/user_model.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -143,6 +145,8 @@ class _LoginpageState extends State<Loginpage> {
                   //   //   return _showErrorDialog(result['message']);
                   //   // }
                   // },
+
+                  //hive store
                   onPressed: () async {
                     final result = await Apiservice.userLogin(
                       _emailcontroller.text.trim(),
@@ -150,7 +154,12 @@ class _LoginpageState extends State<Loginpage> {
                     );
 
                     if (result != null && result['code'] == 200) {
-                      Navigator.push(
+                      final user = UserModel.fromJson(result['data']);
+
+                      final userBox = Hive.box<UserModel>('userBox');
+                      await userBox.put('currentUser', user);
+
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => const Intro()),
                       );
