@@ -52,6 +52,8 @@ class _LoginpageState extends State<Loginpage> {
       final user = UserModel.fromJson(result['data']);
       final userBox = Hive.box<UserModel>('userBox');
       await userBox.put('currentUser', user);
+      print('access${user.accessToken}');
+      print('access${user.refreshToken}');
 
       Navigator.pushReplacement(
         context,

@@ -65,10 +65,10 @@ class UserModel extends HiveObject {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] ?? '',
-      userName: json['userName'] ?? '',
-      email: json['email'] ?? '',
-      phoneNumber: json['phoneNumber'] ?? '',
+      id: json['user']['id'] ?? '',
+      userName: json['user']['userName'] ?? '',
+      email: json['user']['email'] ?? '',
+      phoneNumber: json['user']['phoneNumber'] ?? '',
       accessToken: json['access_token'] ?? '',
       refreshToken: json['refresh_token'] ?? '',
     );

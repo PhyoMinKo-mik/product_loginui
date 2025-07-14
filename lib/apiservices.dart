@@ -59,6 +59,7 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:product_loginui/user_model.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
@@ -93,23 +94,20 @@ class Apiservice {
       );
 
       final Map<String, dynamic> data = response.data['data'];
-      final String accessToken = data['access_token'];
-      final String refreshToken = data['refresh_token'];
-      final String id = data['user']['id'];
-      final String userName = data['user']['userName'];
-      final String userEmail = data['user']['email'];
-      final String phoneNumber = data['user']['phoneNumber'];
-
+      print(data);
       final user = UserModel(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        id: id,
-        userName: userName,
-        phoneNumber: phoneNumber,
-        email: userEmail,
+        accessToken: data['access_token'],
+        refreshToken: data['refresh_token'],
+        id: data['user']['id'],
+        userName: data['user']['userName'],
+        phoneNumber: data['user']['phoneNumber'],
+        email: data['user']['email'],
       );
 
-      return {'code': 200, 'data': data};
+      final box = Hive.box<UserModel>('userBox');
+      await box.put('currentUser', user);
+
+      return {'code': 400, 'data': data};
     } on DioException catch (e) {
       if (e.error is SocketException) {
         return {'message': 'no internet connection'};
@@ -124,7 +122,7 @@ class Apiservice {
   static Future<bool> verifyAccessToken(String accessToken) async {
     try {
       final response = await _dio.get(
-        'https://hr.esoftmm.com/core/api/auth/verify-token',
+        'https://hr.esoftmm.com/core/api/auth/refresh-token',
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
       return response.statusCode == 200;
@@ -156,6 +154,106 @@ class Apiservice {
     }
   }
 }
+
+// import 'dart:io';
+// import 'package:dio/dio.dart';
+// import 'package:product_loginui/user_model.dart';
+// import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
+// import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
+
+// class Apiservice {
+//   static final Dio _dio = Dio()
+//     ..interceptors.add(
+//       TalkerDioLogger(
+//         settings: TalkerDioLoggerSettings(
+//           printErrorData: true,
+//           printErrorHeaders: true,
+//           printRequestData: true,
+//           printErrorMessage: true,
+//         ),
+//       ),
+//     );
+
+//   static Future<Map<String, dynamic>?> userLogin(
+//     String username,
+//     String password,
+//   ) async {
+//     Response? response;
+//     try {
+//       final headers = {
+//         'Content-Type': 'application/json',
+//         'Mobile-Request': 'Secure',
+//       };
+//       response = await _dio.post(
+//         'https://hr.esoftmm.com/core/api/auth/access-token',
+//         data: {'username': username, 'password': password, 'device': 'android'},
+//         options: Options(headers: headers),
+//       );
+
+//       final Map<String, dynamic> data = response.data['data'];
+//       final String accessToken = data['access_token'];
+//       final String refreshToken = data['refresh_token'];
+//       final String id = data['user']['id'];
+//       final String userName = data['user']['userName'];
+//       final String userEmail = data['user']['email'];
+//       final String phoneNumber = data['user']['phoneNumber'];
+
+//       final user = UserModel(
+//         accessToken: accessToken,
+//         refreshToken: refreshToken,
+//         id: id,
+//         userName: userName,
+//         phoneNumber: phoneNumber,
+//         email: userEmail,
+//       );
+
+//       return {'code': 200, 'data': data};
+//     } on DioException catch (e) {
+//       if (e.error is SocketException) {
+//         return {'message': 'no internet connection'};
+//       } else if (e.response?.data != null) {
+//         return e.response!.data;
+//       } else {
+//         return {'message': 'something went wrong'};
+//       }
+//     }
+//   }
+
+//   static Future<bool> verifyAccessToken(String accessToken) async {
+//     try {
+//       final response = await _dio.get(
+//         'https://hr.esoftmm.com/core/api/auth/refresh-token',
+//         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+//       );
+//       return response.statusCode == 200;
+//     } catch (_) {
+//       return false;
+//     }
+//   }
+
+//   static Future<Map<String, dynamic>?> refreshAccessToken(
+//     String refreshToken,
+//   ) async {
+//     try {
+//       final response = await _dio.post(
+//         'https://hr.esoftmm.com/core/api/auth/refresh-token',
+//         data: {'refresh_token': refreshToken},
+//       );
+
+//       if (response.statusCode == 200) {
+//         return response.data['data'];
+//       } else {
+//         return null;
+//       }
+//     } on DioException catch (e) {
+//       if (e.error is SocketException) {
+//         return {'message': 'no internet connection'};
+//       } else {
+//         return null;
+//       }
+//     }
+//   }
+// }
 
 // import 'dart:convert';
 // import 'package:dio/dio.dart';
