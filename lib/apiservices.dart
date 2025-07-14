@@ -107,7 +107,7 @@ class Apiservice {
       final box = Hive.box<UserModel>('userBox');
       await box.put('currentUser', user);
 
-      return {'code': 400, 'data': data};
+      return {'code': 200, 'data': data};
     } on DioException catch (e) {
       if (e.error is SocketException) {
         return {'message': 'no internet connection'};
@@ -119,31 +119,33 @@ class Apiservice {
     }
   }
 
-  static Future<bool> verifyAccessToken(String accessToken) async {
-    try {
-      final response = await _dio.get(
-        'https://hr.esoftmm.com/core/api/auth/refresh-token',
-        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
-      );
-      return response.statusCode == 200;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  static Future<Map<String, dynamic>?> refreshAccessToken(
+  static Future<Map<String, dynamic>?> userToken(
     String refreshToken,
+    String accessToken,
   ) async {
     try {
+      final headers = {
+        'Content-Type': 'application/json',
+        'Mobile-Request': 'Secure',
+      };
       final response = await _dio.post(
         'https://hr.esoftmm.com/core/api/auth/refresh-token',
-        data: {'refresh_token': refreshToken},
+        data: {
+          'access_token': accessToken,
+          'refresh_token': refreshToken,
+          'device': 'android',
+        },
+        options: Options(headers: headers),
       );
 
       if (response.statusCode == 200) {
         return response.data['data'];
       } else {
-        return null;
+        return {
+          'success': false,
+          'message': 'Unexpected status: ${response.statusCode}',
+          'error': response.data?.toString() ?? 'No response data',
+        };
       }
     } on DioException catch (e) {
       if (e.error is SocketException) {

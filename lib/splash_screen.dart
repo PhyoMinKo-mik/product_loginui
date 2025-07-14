@@ -154,39 +154,27 @@ class _SplashScreenState extends State<SplashScreen> {
     print('Saving user: ${user?.accessToken}');
 
     if (user != null) {
-      final isValid = await Apiservice.verifyAccessToken(user.accessToken);
+      final refreshed = await Apiservice.userToken(
+        user.refreshToken,
+        user.accessToken,
+      );
 
-      if (isValid) {
+      if (refreshed != null) {
+        final updatedUser = UserModel(
+          accessToken: refreshed['access_token'],
+          refreshToken: refreshed['refresh_token'],
+          id: user.id,
+          userName: user.userName,
+          phoneNumber: user.phoneNumber,
+          email: user.email,
+        );
+        await box.put('currentUser', updatedUser);
+        print('user $updatedUser');
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Intro()),
         );
-      } else {
-        final refreshed = await Apiservice.refreshAccessToken(
-          user.refreshToken,
-        );
-        if (refreshed != null) {
-          final updatedUser = UserModel(
-            accessToken: refreshed['access_token'],
-            refreshToken: refreshed['refresh_token'],
-            id: user.id,
-            userName: user.userName,
-            phoneNumber: user.phoneNumber,
-            email: user.email,
-          );
-          await box.put('currentUser', updatedUser);
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Intro()),
-          );
-        } else {
-          await box.delete('currentUser');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Loginpage()),
-          );
-        }
       }
     } else {
       Navigator.pushReplacement(
