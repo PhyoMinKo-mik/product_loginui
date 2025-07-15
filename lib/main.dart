@@ -31,20 +31,30 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:product_loginui/home_screen.dart';
+import 'package:product_loginui/favroite_screen.dart';
+import 'package:product_loginui/navigation.dart';
+import 'package:provider/provider.dart';
+
+import 'package:product_loginui/user_model.dart';
 import 'package:product_loginui/intro.dart';
 import 'package:product_loginui/sign_in.dart';
 import 'package:product_loginui/sign_up.dart';
 import 'package:product_loginui/splash_screen.dart';
-import 'package:product_loginui/user_model.dart';
+import 'package:product_loginui/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   await Hive.openBox<UserModel>('userBox');
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => FavoriteManager(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -60,11 +70,12 @@ class MyApp extends StatelessWidget {
         '/Login': (context) => const Loginpage(),
         '/SignUp': (context) => const SignUp(),
         '/Intro': (context) => const Intro(),
-        '/Home': (context) => const HomeScreen(),
+        '/Home': (context) => const MainScreen(),
       },
     );
   }
 }
+
 
 //   @override
 //   Widget build(BuildContext context) {

@@ -9,6 +9,20 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // bottomNavigationBar: BottomNavigationBar(
+      //   onTap: (index) {},
+      //   items: const [
+      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.notification_add),
+      //       label: 'Noti',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.favorite),
+      //       label: 'Favroite',
+      //     ),
+      //   ],
+      // ),
       appBar: AppBar(
         title: const Text(
           'Our Products',
