@@ -63,6 +63,7 @@ import 'package:hive/hive.dart';
 import 'package:product_loginui/user_model.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
+import 'product_model.dart'; // <- Make sure this points to your Product class
 
 class Apiservice {
   static final Dio _dio = Dio()
@@ -94,7 +95,6 @@ class Apiservice {
       );
 
       final Map<String, dynamic> data = response.data['data'];
-      print(data);
       final user = UserModel(
         accessToken: data['access_token'],
         refreshToken: data['refresh_token'],
@@ -153,6 +153,23 @@ class Apiservice {
       } else {
         return null;
       }
+    }
+  }
+
+  static Future<List<Product>> fetchProducts() async {
+    try {
+      final response = await _dio.get('https://fakestoreapi.com/products');
+
+      if (response.statusCode == 200 && response.data is List) {
+        return (response.data as List)
+            .map((item) => Product.fromJson(item))
+            .toList();
+      } else {
+        throw Exception('Failed to load products: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      print('Fetch products error: $e');
+      throw Exception('Failed to load products');
     }
   }
 }

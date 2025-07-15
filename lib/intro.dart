@@ -24,7 +24,7 @@ class _IntroState extends State<Intro> {
 
   Future<void> _logout() async {
     await Hive.box<UserModel>('userBox').delete('currentUser');
-    Navigator.pushNamedAndRemoveUntil(context, '/SignUp', (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, '/Home', (route) => false);
   }
 
   @override
@@ -141,16 +141,13 @@ class _IntroState extends State<Intro> {
                         ),
                       ),
                       onPressed: _logout,
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      child: const Text('Home', style: TextStyle(fontSize: 16)),
                     ),
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/SignUp');
+                      Navigator.pushNamed(context, '/Home');
                     },
                     child: const Text(
                       'Or Create Account →',

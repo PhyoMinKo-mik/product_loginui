@@ -31,6 +31,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:product_loginui/home_screen.dart';
 import 'package:product_loginui/intro.dart';
 import 'package:product_loginui/sign_in.dart';
 import 'package:product_loginui/sign_up.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         '/Login': (context) => const Loginpage(),
         '/SignUp': (context) => const SignUp(),
         '/Intro': (context) => const Intro(),
+        '/Home': (context) => const HomeScreen(),
       },
     );
   }
