@@ -32,6 +32,10 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.favorite),
             label: "Favorites",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_box),
+            label: 'Profile',
+          ),
         ],
       ),
     );

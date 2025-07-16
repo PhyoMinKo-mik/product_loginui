@@ -78,7 +78,7 @@ class Apiservice {
       ),
     );
 
-  static Future<Map<String, dynamic>?> userLogin(
+  static Future<Map<String, dynamic>> userLogin(
     String username,
     String password,
   ) async {
@@ -150,10 +150,9 @@ class Apiservice {
     } on DioException catch (e) {
       if (e.error is SocketException) {
         return {'message': 'no internet connection'};
-      } else {
-        return null;
       }
     }
+    return null;
   }
 
   static Future<List<Product>> fetchProducts() async {

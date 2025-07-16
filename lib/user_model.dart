@@ -69,8 +69,8 @@ class UserModel extends HiveObject {
       userName: json['user']['userName'] ?? '',
       email: json['user']['email'] ?? '',
       phoneNumber: json['user']['phoneNumber'] ?? '',
-      accessToken: json['access_token'] ?? '',
-      refreshToken: json['refresh_token'] ?? '',
+      accessToken: json['access_token'],
+      refreshToken: json['refresh_token'],
     );
   }
 }
