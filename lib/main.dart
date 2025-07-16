@@ -33,6 +33,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:product_loginui/favroite_screen.dart';
 import 'package:product_loginui/navigation.dart';
+import 'package:product_loginui/product_model.dart';
+import 'package:product_loginui/profile_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:product_loginui/user_model.dart';
@@ -40,14 +42,16 @@ import 'package:product_loginui/intro.dart';
 import 'package:product_loginui/sign_in.dart';
 import 'package:product_loginui/sign_up.dart';
 import 'package:product_loginui/splash_screen.dart';
-import 'package:product_loginui/main_screen.dart';
+import 'package:product_loginui/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Hive.initFlutter();
+
   Hive.registerAdapter(UserModelAdapter());
+  Hive.registerAdapter(ProductAdapter());
   await Hive.openBox<UserModel>('userBox');
+  await Hive.openBox<Product>('favoriteBox');
 
   runApp(
     ChangeNotifierProvider(
@@ -71,6 +75,7 @@ class MyApp extends StatelessWidget {
         '/SignUp': (context) => const SignUp(),
         '/Intro': (context) => const Intro(),
         '/Home': (context) => const MainScreen(),
+        '/Profile': (context) => const ProfileScreen(),
       },
     );
   }

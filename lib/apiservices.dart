@@ -63,7 +63,7 @@ import 'package:hive/hive.dart';
 import 'package:product_loginui/user_model.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
-import 'product_model.dart'; // <- Make sure this points to your Product class
+import 'product_model.dart';
 
 class Apiservice {
   static final Dio _dio = Dio()

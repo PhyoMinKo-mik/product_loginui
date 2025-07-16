@@ -28,11 +28,16 @@ class HomeScreen extends StatelessWidget {
           'Our Products',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: const [
-          CircleAvatar(
-            backgroundImage: AssetImage('assets/image/CatBatman.jpg'),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/Profile');
+            },
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/image/CatBatman.jpg'),
+            ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
         ],
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,

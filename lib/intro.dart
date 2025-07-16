@@ -23,7 +23,7 @@ class _IntroState extends State<Intro> {
   ];
 
   Future<void> _logout() async {
-    await Hive.box<UserModel>('userBox').delete('currentUser');
+    // await Hive.box<UserModel>('userBox').delete('currentUser');
     Navigator.pushNamedAndRemoveUntil(context, '/Home', (route) => false);
   }
 
