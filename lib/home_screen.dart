@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:product_loginui/widgets/product_card.dart';
 import 'package:product_loginui/apiservices.dart';
+import 'package:product_loginui/widgets/product_card.dart';
 import 'package:product_loginui/product_model.dart';
 
 class HomeScreen extends StatelessWidget {

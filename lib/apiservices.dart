@@ -60,6 +60,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
+import 'package:product_loginui/api_exception.dart';
 import 'package:product_loginui/user_model.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'package:talker_dio_logger/talker_dio_logger_settings.dart';
@@ -82,19 +83,20 @@ class Apiservice {
     String username,
     String password,
   ) async {
-    Response? response;
     try {
       final headers = {
         'Content-Type': 'application/json',
         'Mobile-Request': 'Secure',
       };
-      response = await _dio.post(
+
+      final response = await _dio.post(
         'https://hr.esoftmm.com/core/api/auth/access-token',
         data: {'username': username, 'password': password, 'device': 'android'},
         options: Options(headers: headers),
       );
 
       final Map<String, dynamic> data = response.data['data'];
+
       final user = UserModel(
         accessToken: data['access_token'],
         refreshToken: data['refresh_token'],
@@ -107,19 +109,20 @@ class Apiservice {
       final box = Hive.box<UserModel>('userBox');
       await box.put('currentUser', user);
 
-      return {'code': 200, 'data': data};
+      return {'success': true, 'data': data};
     } on DioException catch (e) {
-      if (e.error is SocketException) {
-        return {'message': 'no internet connection'};
-      } else if (e.response?.data != null) {
-        return e.response!.data;
-      } else {
-        return {'message': 'something went wrong'};
-      }
+      return {
+        'success': false,
+        'message': ApiException().getExceptionMessage(e).join(" - "),
+      };
+    } on SocketException {
+      return {'success': false, 'message': 'No internet connection'};
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong'};
     }
   }
 
-  static Future<Map<String, dynamic>?> userToken(
+  static Future<Map<String, dynamic>> userToken(
     String refreshToken,
     String accessToken,
   ) async {
@@ -128,6 +131,7 @@ class Apiservice {
         'Content-Type': 'application/json',
         'Mobile-Request': 'Secure',
       };
+
       final response = await _dio.post(
         'https://hr.esoftmm.com/core/api/auth/refresh-token',
         data: {
@@ -139,20 +143,25 @@ class Apiservice {
       );
 
       if (response.statusCode == 200) {
-        return response.data['data'];
+        return {
+          'success': true,
+          'access_token': response.data['data']['access_token'],
+          'refresh_token': response.data['data']['refresh_token'],
+        };
       } else {
         return {
           'success': false,
           'message': 'Unexpected status: ${response.statusCode}',
-          'error': response.data?.toString() ?? 'No response data',
         };
       }
     } on DioException catch (e) {
-      if (e.error is SocketException) {
-        return {'message': 'no internet connection'};
-      }
+      return {
+        'success': false,
+        'message': ApiException().getExceptionMessage(e).join(" - "),
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong'};
     }
-    return null;
   }
 
   static Future<List<Product>> fetchProducts() async {
@@ -167,8 +176,9 @@ class Apiservice {
         throw Exception('Failed to load products: ${response.statusCode}');
       }
     } on DioException catch (e) {
-      print('Fetch products error: $e');
-      throw Exception('Failed to load products');
+      throw Exception(ApiException().getExceptionMessage(e).join(" - "));
+    } catch (e) {
+      throw Exception('Something went wrong');
     }
   }
 }

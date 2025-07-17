@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:product_loginui/apiservices.dart';
-import 'package:product_loginui/intro.dart';
-import 'package:product_loginui/user_model.dart';
+import 'package:product_loginui/splash_screen.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -14,7 +12,6 @@ class Loginpage extends StatefulWidget {
 class _LoginpageState extends State<Loginpage> {
   final TextEditingController _emailcontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
-
   bool isChecked = false;
   bool isLoading = false;
 
@@ -39,39 +36,33 @@ class _LoginpageState extends State<Loginpage> {
   }
 
   Future<void> _login() async {
-    setState(() {
-      isLoading = true;
-    });
+    final email = _emailcontroller.text.trim();
+    final password = _passwordcontroller.text.trim();
 
-    final result = await Apiservice.userLogin(
-      _emailcontroller.text.trim(),
-      _passwordcontroller.text.trim(),
-    );
+    if (email.isEmpty || password.isEmpty) {
+      _showErrorDialog("Please enter email and password");
+      return;
+    }
 
-    if (result['code'] == 200) {
-      final user = UserModel.fromJson(result['data']);
-      final userBox = Hive.box<UserModel>('userBox');
-      await userBox.put('currentUser', user);
-      print('access${user.accessToken}');
-      print('access${user.refreshToken}');
+    setState(() => isLoading = true);
 
+    final result = await Apiservice.userLogin(email, password);
+
+    setState(() => isLoading = false);
+
+    if (result['success'] == true) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Intro()),
+        MaterialPageRoute(builder: (context) => const SplashScreen()),
       );
     } else {
       _showErrorDialog(result['message'] ?? 'Login failed. Please try again.');
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -80,7 +71,6 @@ class _LoginpageState extends State<Loginpage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // HEADER
                   Container(
                     height: 250,
                     width: width,
@@ -125,10 +115,7 @@ class _LoginpageState extends State<Loginpage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 100),
-
-                  // Email Field
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: TextField(
@@ -137,18 +124,15 @@ class _LoginpageState extends State<Loginpage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Password Field
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: TextField(
                       controller: _passwordcontroller,
+                      obscureText: true,
                       decoration: const InputDecoration(hintText: 'Password'),
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // Remember Me
                   Padding(
                     padding: const EdgeInsets.only(left: 18),
                     child: Row(
@@ -168,8 +152,6 @@ class _LoginpageState extends State<Loginpage> {
                       ],
                     ),
                   ),
-
-                  // Login Button
                   Padding(
                     padding: const EdgeInsets.only(
                       top: 20,
@@ -203,7 +185,6 @@ class _LoginpageState extends State<Loginpage> {
                       ),
                     ),
                   ),
-
                   const Padding(
                     padding: EdgeInsets.only(top: 10, left: 180),
                     child: Text('Forgot password?'),
@@ -212,8 +193,6 @@ class _LoginpageState extends State<Loginpage> {
               ),
             ),
           ),
-
-          // Loading Overlay
           if (isLoading)
             Positioned.fill(
               child: Container(

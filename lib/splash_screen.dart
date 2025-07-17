@@ -228,6 +228,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _hasNoInternet = false;
+  String _errorMessage = "";
 
   @override
   void initState() {
@@ -237,10 +238,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkConnectivityAndProceed() async {
     final connectivity = await Connectivity().checkConnectivity();
-
     if (connectivity == ConnectivityResult.none) {
       setState(() {
         _hasNoInternet = true;
+        _errorMessage = "No internet connection";
       });
     } else {
       await _navigateAfterDelay();
@@ -258,53 +259,64 @@ class _SplashScreenState extends State<SplashScreen> {
           user.accessToken,
         );
 
-        if (refreshed != null) {
-          final updatedUser = UserModel(
-            accessToken: refreshed['access_token'],
-            refreshToken: refreshed['refresh_token'],
-            id: user.id,
-            userName: user.userName,
-            phoneNumber: user.phoneNumber,
-            email: user.email,
-          );
-          await box.put('currentUser', updatedUser);
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Intro()),
-          );
+        if (refreshed['success'] == false) {
+          setState(() {
+            _errorMessage = refreshed['message'] ?? "Token refresh failed!";
+          });
           return;
         }
-      } catch (e) {
-        debugPrint("Error refreshing token: $e");
-      }
-    }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Loginpage()),
-    );
+        final updatedUser = UserModel(
+          accessToken: refreshed['access_token'],
+          refreshToken: refreshed['refresh_token'],
+          id: user.id,
+          userName: user.userName,
+          phoneNumber: user.phoneNumber,
+          email: user.email,
+        );
+
+        await box.put('currentUser', updatedUser);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Intro()),
+        );
+      } catch (e) {
+        setState(() {
+          _errorMessage = "Error: Something went wrong!";
+        });
+      }
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Loginpage()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: _hasNoInternet
-          ? Center(
-              child: Column(
+      body: Center(
+        child: _hasNoInternet || _errorMessage.isNotEmpty
+            ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.wifi_off, size: 60, color: Colors.black54),
+                  const Icon(Icons.error, color: Colors.red, size: 50),
                   const SizedBox(height: 16),
-                  const Text(
-                    'No internet connection',
-                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                  Text(
+                    _errorMessage,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      setState(() => _hasNoInternet = false);
+                      setState(() {
+                        _hasNoInternet = false;
+                        _errorMessage = "";
+                      });
                       _checkConnectivityAndProceed();
                     },
                     style: ElevatedButton.styleFrom(
@@ -312,11 +324,21 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                     child: const Text('Retry'),
                   ),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Loginpage(),
+                        ),
+                      );
+                    },
+                    child: const Text("Go to Login"),
+                  ),
                 ],
-              ),
-            )
-          : Center(
-              child: Column(
+              )
+            : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Image(
@@ -336,7 +358,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ],
               ),
-            ),
+      ),
     );
   }
 }
