@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:product_loginui/apiservices.dart';
-import 'package:product_loginui/splash_screen.dart';
+import 'package:product_loginui/intro.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -53,7 +53,7 @@ class _LoginpageState extends State<Loginpage> {
     if (result['success'] == true) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SplashScreen()),
+        MaterialPageRoute(builder: (context) => const Intro()),
       );
     } else {
       _showErrorDialog(result['message'] ?? 'Login failed. Please try again.');

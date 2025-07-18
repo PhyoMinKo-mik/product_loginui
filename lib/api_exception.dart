@@ -2,24 +2,25 @@ import 'package:dio/dio.dart';
 
 class ApiException {
   List<String> getExceptionMessage(DioException exception) {
-    switch (exception.type) {
-      case DioExceptionType.badResponse:
-        return ["Bad Response", "invaild API response or server error"];
-      case DioExceptionType.connectionError:
-        return [
-          "Connection Error",
-          "Failed to connect to the server.Check your internet.",
-        ];
-      case DioExceptionType.connectionTimeout:
-        return [
-          "Connection Timeout",
-          "Server took too long to respond.Try again later.",
-        ];
-      default:
-        return [
-          "Unexpected Error",
-          "Something went wrong. Please check your network.",
-        ];
+    String title = "Error";
+    String description = "Something went wrong";
+
+    try {
+      if (exception.response != null &&
+          exception.response?.data is Map<String, dynamic>) {
+        final data = exception.response?.data as Map<String, dynamic>;
+        if (data.containsKey('message')) {
+          description = data['message'].toString();
+        } else {
+          description = exception.message ?? description;
+        }
+      } else {
+        description = exception.message ?? description;
+      }
+    } catch (_) {
+      description = "Something went wrong";
     }
+
+    return [title, description];
   }
 }

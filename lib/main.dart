@@ -36,13 +36,11 @@ import 'package:product_loginui/navigation.dart';
 import 'package:product_loginui/product_model.dart';
 import 'package:product_loginui/profile_page.dart';
 import 'package:provider/provider.dart';
-
 import 'package:product_loginui/user_model.dart';
 import 'package:product_loginui/intro.dart';
 import 'package:product_loginui/sign_in.dart';
 import 'package:product_loginui/sign_up.dart';
 import 'package:product_loginui/splash_screen.dart';
-import 'package:product_loginui/profile_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,8 +48,9 @@ void main() async {
 
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(ProductAdapter());
+
   await Hive.openBox<UserModel>('userBox');
-  await Hive.openBox<Product>('favoriteBox');
+  await Hive.openBox('favoriteBox');
 
   runApp(
     ChangeNotifierProvider(

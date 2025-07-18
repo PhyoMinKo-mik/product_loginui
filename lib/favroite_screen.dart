@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:product_loginui/product_detail_screen.dart';
+import 'package:product_loginui/user_model.dart';
 import 'package:provider/provider.dart';
 import 'package:product_loginui/product_model.dart';
 
@@ -76,32 +77,41 @@ class FavoriteScreen extends StatelessWidget {
 }
 
 class FavoriteManager extends ChangeNotifier {
-  final Box<Product> _box = Hive.box<Product>('favoriteBox');
+  final Box _box = Hive.box('favoriteBox');
 
-  List<Product> get favorites => _box.values.toList();
+  String get _currentUserKey {
+    final userBox = Hive.box<UserModel>('userBox');
+    final currentUser = userBox.get('currentUser');
+    return currentUser != null
+        ? 'favorites_${currentUser.id}'
+        : 'favorites_guest';
+  }
+
+  List<Product> get favorites {
+    final rawList = _box.get(_currentUserKey, defaultValue: <dynamic>[]);
+    return rawList.cast<Product>();
+  }
 
   void toggleFavorite(Product product) {
-    final exists = _box.values.any((p) => p.id == product.id);
+    final currentFavorites = [...favorites];
+    final exists = currentFavorites.any((p) => p.id == product.id);
     if (exists) {
-      final keyToRemove = _box.keys.firstWhere(
-        (key) => _box.get(key)?.id == product.id,
-      );
-      _box.delete(keyToRemove);
+      currentFavorites.removeWhere((p) => p.id == product.id);
     } else {
-      _box.add(product);
+      currentFavorites.add(product);
     }
+    _box.put(_currentUserKey, currentFavorites);
     notifyListeners();
   }
 
   void removeFavorite(Product product) {
-    final keyToRemove = _box.keys.firstWhere(
-      (key) => _box.get(key)?.id == product.id,
-    );
-    _box.delete(keyToRemove);
+    final currentFavorites = [...favorites];
+    currentFavorites.removeWhere((p) => p.id == product.id);
+    _box.put(_currentUserKey, currentFavorites);
     notifyListeners();
   }
 
   bool isFavorite(Product product) {
-    return _box.values.any((p) => p.id == product.id);
+    return favorites.any((p) => p.id == product.id);
   }
 }
