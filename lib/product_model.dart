@@ -32,6 +32,10 @@ class Product extends HiveObject {
     );
   }
 
+  get name => {};
+
+  get price => null;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,

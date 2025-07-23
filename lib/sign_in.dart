@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:product_loginui/apiservices.dart';
 import 'package:product_loginui/intro.dart';
+import 'package:product_loginui/user_manager.dart';
+import 'package:product_loginui/user_model.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -51,6 +54,9 @@ class _LoginpageState extends State<Loginpage> {
     setState(() => isLoading = false);
 
     if (result['success'] == true) {
+      final box = Hive.box<UserModel>('userBox');
+      final user = box.get('currentUser');
+      UserManager.instance.loadFromHive(user!);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Intro()),
