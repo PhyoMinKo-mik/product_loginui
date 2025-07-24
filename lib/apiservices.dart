@@ -143,6 +143,7 @@ class Apiservice {
 
   static Future<List<Product>> fetchProducts() async {
     try {
+      // throw Exception('sww');
       final response = await _dio.get('https://fakestoreapi.com/products');
 
       if (response.statusCode == 200 && response.data is List) {
