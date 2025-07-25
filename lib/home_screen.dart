@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:product_loginui/shimmer_productcard.dart';
 import 'package:product_loginui/apiservices.dart';
+import 'package:product_loginui/shimmer_productcard.dart';
 import 'package:product_loginui/user_data_model/personal_data.dart';
 import 'package:product_loginui/user_manager.dart';
 import 'package:product_loginui/widgets/product_card.dart';
@@ -16,14 +16,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
   String errorMessage = '';
+  List<Product> products = [];
 
   @override
   void initState() {
     super.initState();
-    _loadPersonalData();
+    _loadAllData();
   }
 
-  Future<void> _loadPersonalData() async {
+  Future<void> _loadAllData() async {
     final user = UserManager.instance.currentUser;
 
     if (user.accessToken.isEmpty) {
@@ -34,15 +35,25 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    final result = await Apiservice.fetchPersonalData(user.accessToken);
+    try {
+      final results = await Future.wait([
+        Apiservice.fetchPersonalData(user.accessToken),
+        Apiservice.fetchProducts(),
+      ]);
 
-    if (result['success']) {
-      final personaldata = PersonalData.fromJson(result['data']);
-      UserManager.instance.setPersonalData(personaldata);
-    } else {
-      setState(() {
-        errorMessage = result['message'];
-      });
+      final personalDataResult = results[0] as Map;
+      final productList = results[1] as List<Product>;
+
+      if (personalDataResult['success']) {
+        final personalData = PersonalData.fromJson(personalDataResult['data']);
+        UserManager.instance.setPersonalData(personalData);
+      } else {
+        errorMessage = personalDataResult['message'];
+      }
+
+      products = productList;
+    } catch (e) {
+      errorMessage = 'Something went wrong';
     }
 
     setState(() {
@@ -60,9 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/Profile');
-            },
+            onTap: () => Navigator.pushNamed(context, '/Profile'),
             child: const CircleAvatar(
               backgroundImage: AssetImage('assets/image/CatBatman.jpg'),
             ),
@@ -75,6 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: isLoading
           ? const HomeShimmer()
+          : errorMessage.isNotEmpty
+          ? Center(child: Text(errorMessage))
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -108,31 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: FutureBuilder<List<Product>>(
-                      future: Apiservice.fetchProducts(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return GridView.count(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.8,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            children: List.generate(
-                              6,
-                              (index) => const ProductShimmerCard(),
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No products found'));
-                        } else {
-                          final products = snapshot.data!;
-                          return GridView.count(
+                    child: products.isEmpty
+                        ? const Center(child: Text('No products found'))
+                        : GridView.count(
                             crossAxisCount: 2,
                             childAspectRatio: 0.8,
                             crossAxisSpacing: 12,
@@ -140,10 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: products
                                 .map((product) => ProductCard(product: product))
                                 .toList(),
-                          );
-                        }
-                      },
-                    ),
+                          ),
                   ),
                 ],
               ),
