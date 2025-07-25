@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:product_loginui/shimmer_productcard.dart';
 import 'package:product_loginui/apiservices.dart';
 import 'package:product_loginui/user_data_model/personal_data.dart';
 import 'package:product_loginui/user_manager.dart';
@@ -73,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const HomeShimmer()
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -112,8 +113,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return GridView.count(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.8,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            children: List.generate(
+                              6,
+                              (index) => const ProductShimmerCard(),
+                            ),
                           );
                         } else if (snapshot.hasError) {
                           return Center(
@@ -129,9 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             childAspectRatio: 0.8,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            children: products.map((product) {
-                              return ProductCard(product: product);
-                            }).toList(),
+                            children: products
+                                .map((product) => ProductCard(product: product))
+                                .toList(),
                           );
                         }
                       },
