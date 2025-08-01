@@ -13,4 +13,12 @@ class PersonalData {
       attendance: UserAttendance.fromJson(json['attendance']),
     );
   }
+
+  get fullName => null;
+
+  get email => null;
+
+  get phoneNumber => null;
+
+  get photo => null;
 }

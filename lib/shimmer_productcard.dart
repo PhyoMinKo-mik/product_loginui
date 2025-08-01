@@ -13,7 +13,6 @@
 //         padding: const EdgeInsets.all(16.0),
 //         child: Column(
 //           children: [
-//             // 🔍 Search Bar Shimmer
 //             Container(
 //               height: 50,
 //               decoration: BoxDecoration(
@@ -23,7 +22,6 @@
 //             ),
 //             const SizedBox(height: 16),
 
-//             // 🏷️ Category Chips Shimmer
 //             SizedBox(
 //               height: 40,
 //               child: ListView.builder(
@@ -42,7 +40,6 @@
 //             ),
 //             const SizedBox(height: 16),
 
-//             // 📝 Section Title Shimmer
 //             Container(
 //               height: 20,
 //               width: double.infinity,
@@ -53,7 +50,6 @@
 //             ),
 //             const SizedBox(height: 10),
 
-//             // 🛒 Grid of Product Cards
 //             Expanded(
 //               child: GridView.count(
 //                 crossAxisCount: 2,
@@ -95,7 +91,6 @@
 //       child: Column(
 //         crossAxisAlignment: CrossAxisAlignment.start,
 //         children: [
-//           // 🖼️ Image placeholder
 //           Container(
 //             height: 120,
 //             width: double.infinity,
@@ -106,7 +101,6 @@
 //           ),
 //           const SizedBox(height: 12),
 
-//           // 🔤 Product Title Line
 //           Container(
 //             height: 14,
 //             width: double.infinity,
@@ -117,7 +111,6 @@
 //           ),
 //           const SizedBox(height: 10),
 
-//           // 💰 Price Line
 //           Container(
 //             height: 12,
 //             width: 70,
@@ -131,7 +124,6 @@
 //     );
 //   }
 // }
-
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -227,7 +219,7 @@ class ProductShimmerCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 150,
+              height: 120,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.grey[400],

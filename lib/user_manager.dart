@@ -14,18 +14,14 @@ class UserManager {
 
   UserManager._internal();
 
-  void loadFromHive(UserModel user) {
-    _user = user;
-  }
+  void loadFromHive(UserModel user) => _user = user;
 
   void updateUser(UserModel newUser) {
     _user = newUser;
     Hive.box<UserModel>('userBox').put('currentUser', newUser);
   }
 
-  void setPersonalData(PersonalData data) {
-    _personalData = data;
-  }
+  void setPersonalData(PersonalData data) => _personalData = data;
 
   void logout() {
     Hive.box<UserModel>('userBox').delete('currentUser');

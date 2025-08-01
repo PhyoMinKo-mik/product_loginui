@@ -49,20 +49,24 @@ class _LoginpageState extends State<Loginpage> {
 
     setState(() => isLoading = true);
 
-    final result = await Apiservice.userLogin(email, password);
+    final result = await ApiService.userLogin(email, password);
 
     setState(() => isLoading = false);
 
-    if (result['success'] == true) {
+    if (result.errorMessage == null && result.data != null) {
       final box = Hive.box<UserModel>('userBox');
-      final user = box.get('currentUser');
-      UserManager.instance.loadFromHive(user!);
+      await box.put('currentUser', result.data!);
+
+      UserManager.instance.loadFromHive(result.data!);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Intro()),
       );
     } else {
-      _showErrorDialog(result['message'] ?? 'Login failed. Please try again.');
+      _showErrorDialog(
+        result.errorMessage ?? 'Login failed. Please try again.',
+      );
     }
   }
 

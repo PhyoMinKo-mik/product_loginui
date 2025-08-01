@@ -7,7 +7,12 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = UserManager.instance.currentUser;
-    final personalData = UserManager.instance.personalData;
+    final personal = UserManager.instance.personalData;
+
+    final fullName = personal?.fullName ?? user.userName;
+    final email = personal?.email ?? user.email;
+    final phone = personal?.phoneNumber ?? user.phoneNumber;
+    final avatarUrl = personal?.photo;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
@@ -20,28 +25,33 @@ class ProfileScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          const CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage('assets/image/CatBatman.jpg'),
-          ),
-          const SizedBox(height: 12),
-          // Text(
-          //   personalData?['fullName'] ?? user.userName,
-          //   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          // ),
-          // const SizedBox(height: 4),
-          // Text(
-          //   personalData?['email'] ?? user.email,
-          //   style: TextStyle(color: Colors.grey[700]),
-          // ),
-          const SizedBox(height: 30),
-          Expanded(
-            child: Container(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: avatarUrl != null
+                  ? NetworkImage(avatarUrl)
+                  : null,
+              backgroundColor: Colors.orange,
+              child: avatarUrl == null
+                  ? const Icon(Icons.person, size: 50, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              fullName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(email, style: TextStyle(color: Colors.grey[700])),
+            const SizedBox(height: 4),
+            Text(phone, style: TextStyle(color: Colors.grey[700])),
+            const SizedBox(height: 30),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: ListView(
+              child: Column(
                 children: [
                   _buildTile(Icons.edit, 'Edit Profile', () {}),
                   _buildTile(Icons.shopping_bag, 'Order History', () {}),
@@ -58,8 +68,8 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

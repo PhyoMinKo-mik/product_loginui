@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:product_loginui/favroite_screen.dart';
 import 'package:product_loginui/home_screen.dart';
+import 'package:product_loginui/profile_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -12,7 +13,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [const HomeScreen(), const FavoriteScreen()];
+  final List<Widget> _screens = [
+    const HomeScreen(),
+    const FavoriteScreen(),
+    const ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +27,7 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _currentIndex,
         selectedItemColor: Colors.orange,
         onTap: (index) {
+          if (!mounted) return;
           setState(() {
             _currentIndex = index;
           });
